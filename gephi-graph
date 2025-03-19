@@ -1,0 +1,41 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Define cascade data
+cascade_data = {
+    "cascade_id": 1,
+    "original_user_id": 1,
+    "timestamp": -2414170800,
+    "number_of_participants": 6,
+    "participants": [
+        {"path": "1", "time": 0},
+        {"path": "1/51", "time": 488},
+        {"path": "1/58", "time": 549},
+        {"path": "1/146", "time": 1400},
+        {"path": "1/51/356", "time": 2648},
+        {"path": "1/51/356/571", "time": 3743},
+        {"path": "1/104793", "time": 31502},
+    ],
+}
+
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add edges based on citation paths
+for participant in cascade_data["participants"]:
+    path_nodes = participant["path"].split("/")
+    for i in range(len(path_nodes) - 1):
+        G.add_edge(path_nodes[i], path_nodes[i + 1], time=participant["time"])
+
+# Draw the graph with a visually appealing layout
+plt.figure(figsize=(10, 7))
+pos = nx.kamada_kawai_layout(G)  # Better node positioning
+nx.draw(G, pos, with_labels=True, node_size=1000, node_color="skyblue", edge_color="black", linewidths=1, font_size=12, font_weight="bold")
+
+# Draw edge labels with time delays
+edge_labels = {(u, v): f"{d['time']}s" for u, v, d in G.edges(data=True)}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10, font_color="red")
+
+# Display the graph
+plt.title("Cascade Graph for Cascade ID 1")
+plt.show()
